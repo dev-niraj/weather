@@ -1,6 +1,7 @@
 import os
 import csv
 from collections import namedtuple
+from typing import List
 
 data = []
 
@@ -19,10 +20,11 @@ def init():
     with open(filename, 'r', encoding='utf-8') as f:
         reader = csv.DictReader(f)
 
+        data.clear()
+
         for row in reader:
-            row = parse_row(row)
-            print(type(row.get('actual_precipitation')),
-                  row.get('actual_precipitation'))
+            record = parse_row(row)
+            data.append(record)
 
 
 def parse_row(row):
@@ -39,8 +41,22 @@ def parse_row(row):
     row['average_precipitation'] = float(row['average_precipitation'])
     row['record_precipitation'] = float(row['record_precipitation'])
     
-    r = Record(
+    record = Record(
         **row
     )
 
-    return row
+    return record
+
+
+def hot_days() -> List[Record]:
+    return sorted(data, key=lambda r: r.actual_max_temp)
+
+
+def cold_days() -> List[Record]:
+    return sorted(data, key=lambda r: r.actual_min_temp)
+
+
+def wet_days() -> List[Record]:
+    return sorted(data, key=lambda r: r.actual_precipitation)
+
+
